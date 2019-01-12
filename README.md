@@ -1,6 +1,5 @@
 # Calculator
 A simple Calculator For calculation :pencil: between Two Numbers
-![](https://www.srinsofttech.com/images/sst/technologies-smallmedium/java-smallmedium.jpg)
 ## Installation
 
 Download This [Calculator](https://github.com/MadhabaPatra/Calculator/blob/master/dist/Calculator.jar?raw=true)
