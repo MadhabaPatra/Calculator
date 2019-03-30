@@ -5,6 +5,9 @@
  */
 package calculator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author Madhaba Patra
@@ -15,9 +18,8 @@ public class CalculatorPanel extends javax.swing.JFrame {
     /**
      * Creates new form CalculatorPanel
      */
-      String Msg="",Tempvalue="";
-      double a=0,b=0,result=0;
-      int Operator=0;
+      String Msg="";
+      double result=0;
       
     public CalculatorPanel() {
         initComponents();
@@ -329,7 +331,6 @@ public class CalculatorPanel extends javax.swing.JFrame {
 
     private void jButton17ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton17ActionPerformed
         // command for DOT (.)
-        Tempvalue=Tempvalue.concat(".");
         Msg=Msg.concat(".");
         Output.setText(Msg);
 
@@ -338,141 +339,223 @@ public class CalculatorPanel extends javax.swing.JFrame {
     private void jButton16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton16ActionPerformed
         // command to clear
         Output.setText("");
-        a=0;
-        b=0;
-        Tempvalue="";
         Msg="";
     }//GEN-LAST:event_jButton16ActionPerformed
 
-    private void jButton15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton15ActionPerformed
-        // final result after =
-        b=Double.parseDouble(Tempvalue);
-
-        switch(Operator)
-        {
-            case 1:
-            result=a+b;
-            break;
-            case 2:
-            result=a-b;
-            break;
-            case 3:
-            result=a*b;
-            break;
-            case 4:
-            result=a/b;
-            break;
-        }
-        Output.setText(String.valueOf("="+result));
-        a=0;
-        b=0;
-        Tempvalue="";
-        Msg="";
+    private void jButton15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton15ActionPerformed   
+    	if (getAnswer(Msg).equalsIgnoreCase("error")){
+    		Output.setText("Wrong operation");
+    	}
+    	else {
+        	Output.setText("="+getAnswer(Msg));      
+            Msg="";
+    	}
+   
     }//GEN-LAST:event_jButton15ActionPerformed
+    
+    private static List<String> getSymbols(String string)
+    {
+    	List<String> listOfSymbols=new ArrayList<String>(); 
+    	for(int i=0;i<string.length();i++)
+    	{
+    		String letter = Character.toString(string.charAt(i));
 
+    		if(letter.matches(("\\-|\\+|\\*|\\/")))
+    		{
+    			listOfSymbols.add(letter);
+    		}
+    	}
+    	return listOfSymbols;
+    }
+
+    private static List<String> getOperands(String string)
+    {
+    	String[] operandsArray=string.split("\\-|\\+|\\*|\\/");
+    	List<String> listOfOperands=new ArrayList<String>();
+
+    	for (String string2 : operandsArray) {
+    		listOfOperands.add(string2);
+    	}
+    	return listOfOperands;
+    }
+
+    private static void listUpdater(List<String> listOfSymbols,List<String> listOfOperands,double result, int position)
+    {
+    	listOfSymbols.remove(position);
+    	listOfOperands.remove(position);
+    	listOfOperands.remove(position);
+    	listOfOperands.add(position,String.valueOf(result));
+    }
+
+    private static String getAnswer(String string)
+    {
+        List<String> listOfSymbols=getSymbols(string);
+        List<String> listOfOperands=getOperands(string);
+        double operand1=0,operand2=0, result=0;
+        
+        for (int i=0; i<=listOfSymbols.size();i++)
+        {
+        	result = 0;
+            if(listOfSymbols.contains("*") || listOfSymbols.contains("/"))
+            {
+                int currentPositionMultiplication=listOfSymbols.indexOf("*");
+                int currentPositionDividation=listOfSymbols.indexOf("/");
+
+                if((currentPositionMultiplication<currentPositionDividation && currentPositionMultiplication!=-1) || currentPositionDividation==-1)
+                {
+                	try {
+                    operand1=Double.parseDouble(listOfOperands.get(currentPositionMultiplication));
+                    operand2=Double.parseDouble(listOfOperands.get(currentPositionMultiplication+1));
+                    result+=operand1*operand2;
+                	}
+                	   catch (NumberFormatException nfe) {
+                         return "error";  
+                       }
+                		catch ( IndexOutOfBoundsException x) {
+                        return "error" ;
+                    }
+                    listUpdater(listOfSymbols,listOfOperands,result, currentPositionMultiplication);
+                }
+                else if((currentPositionMultiplication>currentPositionDividation && currentPositionDividation!=-1) || currentPositionMultiplication==-1)
+                {
+                	try {
+                    operand1=Double.parseDouble(listOfOperands.get(currentPositionDividation));
+                    operand2=Double.parseDouble(listOfOperands.get(currentPositionDividation+1));
+                    result+=operand1/operand2;
+                	}
+                    catch (NumberFormatException nfe) {
+                    	 return "error";  
+                    }
+                	catch ( IndexOutOfBoundsException x) {
+                		 return "error";  
+                    }
+                    listUpdater(listOfSymbols,listOfOperands,result,currentPositionDividation);
+                }
+
+            }
+            else if(listOfSymbols.contains("-") || listOfSymbols.contains("+"))
+            {
+                int currentPositionSubstraction=listOfSymbols.indexOf("-");
+                int currentPositionAddition=listOfSymbols.indexOf("+");
+
+                if((currentPositionSubstraction<currentPositionAddition && currentPositionSubstraction!=-1) || currentPositionAddition==-1)
+                {
+                	try {
+                		operand1=Double.parseDouble(listOfOperands.get(currentPositionSubstraction));
+                		operand2=Double.parseDouble(listOfOperands.get(currentPositionSubstraction+1));
+                		result+=operand1-operand2;
+                	}
+                	catch (NumberFormatException nfe) {
+                		return "error";  
+                	}
+                	catch ( IndexOutOfBoundsException x) {
+                		return "error";  
+                	}
+
+                	listUpdater(listOfSymbols,listOfOperands,result, currentPositionSubstraction);
+                }
+                else if((currentPositionSubstraction>currentPositionAddition && currentPositionAddition!=-1) || currentPositionSubstraction==-1)
+                {
+                	try {
+                		operand1=Double.parseDouble(listOfOperands.get(currentPositionAddition));
+                		operand2=Double.parseDouble(listOfOperands.get(currentPositionAddition+1));
+                		result+=operand1+operand2;
+                	}
+                	catch (NumberFormatException nfe) {
+                		return "error";
+                	}
+                	catch ( IndexOutOfBoundsException x) {
+                		return "error";  
+                	}
+                    listUpdater(listOfSymbols,listOfOperands,result,currentPositionAddition);
+                }
+
+            }
+        }
+        return Double.toString(result);
+        
+    }
     private void jButton14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton14ActionPerformed
         // command for division (/)
-        a=Double.parseDouble(Tempvalue);
-        Operator=4;
         Msg=Msg.concat("/");
         Output.setText(Msg);
-        Tempvalue="";
     }//GEN-LAST:event_jButton14ActionPerformed
 
     private void jButton13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton13ActionPerformed
         // command for multipication (*)
-        a=Double.parseDouble(Tempvalue);
-        Operator=3;
         Msg=Msg.concat("*");
         Output.setText(Msg);
-        Tempvalue="";
     }//GEN-LAST:event_jButton13ActionPerformed
 
     private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
         // command for substraction (-)
-        a=Double.parseDouble(Tempvalue);
-        Operator=2;
         Msg=Msg.concat("-");
         Output.setText(Msg);
-        Tempvalue="";
     }//GEN-LAST:event_jButton12ActionPerformed
 
     private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
         // command for addition (+)
-         a=Double.parseDouble(Tempvalue);
-        Operator=1;
         Msg=Msg.concat("+");
         Output.setText(Msg);
-        Tempvalue="";
 
     }//GEN-LAST:event_jButton11ActionPerformed
 
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
         // command for 0
-        Tempvalue=Tempvalue.concat("0");
         Msg=Msg.concat("0");
         Output.setText(Msg);
     }//GEN-LAST:event_jButton10ActionPerformed
 
     private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
         // command for 9
-        Tempvalue=Tempvalue.concat("9");
         Msg=Msg.concat("9");
         Output.setText(Msg);
     }//GEN-LAST:event_jButton9ActionPerformed
 
     private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
         // command for 8
-        Tempvalue=Tempvalue.concat("8");
         Msg=Msg.concat("8");
         Output.setText(Msg);
     }//GEN-LAST:event_jButton8ActionPerformed
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
         // command for 7
-        Tempvalue=Tempvalue.concat("7");
         Msg=Msg.concat("7");
         Output.setText(Msg);
     }//GEN-LAST:event_jButton7ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         // command for 6
-        Tempvalue=Tempvalue.concat("6");
         Msg=Msg.concat("6");
         Output.setText(Msg);
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         // command for 5
-        Tempvalue=Tempvalue.concat("5");
         Msg=Msg.concat("5");
         Output.setText(Msg);
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // command for 4
-        Tempvalue=Tempvalue.concat("4");
         Msg=Msg.concat("4");
         Output.setText(Msg);
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // command for 3
-        Tempvalue=Tempvalue.concat("3");
         Msg=Msg.concat("3");
         Output.setText(Msg);
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // command for 2
-        Tempvalue=Tempvalue.concat("2");
         Msg=Msg.concat("2");
         Output.setText(Msg);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // command for 1
-        Tempvalue=Tempvalue.concat("1");
         Msg=Msg.concat("1");
         Output.setText(Msg);
     }//GEN-LAST:event_jButton1ActionPerformed
