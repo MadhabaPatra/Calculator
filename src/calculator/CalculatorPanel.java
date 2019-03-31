@@ -348,7 +348,7 @@ public class CalculatorPanel extends javax.swing.JFrame {
     	}
     	else {
         	Output.setText("="+getAnswer(Msg));      
-            Msg="";
+            Msg=getAnswer(Msg);
     	}
    
     }//GEN-LAST:event_jButton15ActionPerformed
