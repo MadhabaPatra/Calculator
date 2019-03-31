@@ -1,5 +1,5 @@
 # Calculator
-A simple Calculator For calculation :pencil: between Two Numbers
+A simple Calculator For multiple calculation :pencil:
 ## Installation
 
 Download This [Calculator](https://github.com/MadhabaPatra/Calculator/blob/master/dist/Calculator.jar?raw=true)
